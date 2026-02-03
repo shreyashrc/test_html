@@ -8,29 +8,64 @@
   <!-- Confetti library -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 
+  <!-- PuLa 100 Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Martel:wght@200;300;400;600;700;800;900&display=swap" rel="stylesheet">
+  
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap');
+
     :root {
-      --bg1: #ffd6e7;
-      --bg2: #ffeef6;
-      --card: #ffffffcc;
-      --yes: #ff3b7a;
-      --yesHover: #ff1f68;
+      --bg-start: #fff0f6;
+      --bg-mid: #ffe4ec;
+      --bg-end: #ffd6e3;
+      --accent-coral: #ff6b7a;
+      --accent-rose: #ff85a1;
+      --accent-deep: #ff4757;
+      --accent-peach: #ffb3ba;
+      --accent-lavender: #e4b1f0;
+      --text-dark: #4a2c4a;
+      --text-medium: #704e70;
+      --card-bg: rgba(255, 255, 255, 0.7);
+      --card-border: rgba(255, 107, 122, 0.3);
     }
 
-    * { box-sizing: border-box; }
+    * { 
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
     body {
-      margin: 0;
-      min-height: 100svh;
-      display: grid;
-      place-items: center;
-      background: radial-gradient(circle at top, var(--bg2), var(--bg1));
-      font-family: system-ui, sans-serif;
-      overflow: hidden;
-      padding: 16px;
+      min-height: 100vh;
+      background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-mid) 50%, var(--bg-end) 100%);
+      font-family: 'Crimson Text', 'Martel', serif;
+      color: var(--text-dark);
+      overflow-x: hidden;
+      position: relative;
     }
 
-    /* FULL-SCREEN CONFETTI CANVAS */
+    /* Animated background particles */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: 
+        radial-gradient(3px 3px at 20% 30%, rgba(255, 107, 122, 0.15), transparent),
+        radial-gradient(2px 2px at 60% 70%, rgba(255, 133, 161, 0.2), transparent),
+        radial-gradient(4px 4px at 50% 50%, rgba(228, 177, 240, 0.1), transparent),
+        radial-gradient(2px 2px at 80% 10%, rgba(255, 179, 186, 0.15), transparent),
+        radial-gradient(3px 3px at 30% 80%, rgba(255, 107, 122, 0.1), transparent);
+      background-size: 300% 300%;
+      animation: shimmer 25s ease-in-out infinite;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    @keyframes shimmer {
+      0%, 100% { background-position: 0% 0%; }
+      50% { background-position: 100% 100%; }
+    }
+
     #confettiCanvas {
       position: fixed;
       inset: 0;
@@ -40,26 +75,184 @@
       z-index: 9999;
     }
 
-    .card {
-      width: min(720px, 92vw);
-      padding: 26px 22px;
-      background: var(--card);
-      backdrop-filter: blur(10px);
-      border-radius: 22px;
+    .container {
+      position: relative;
+      z-index: 2;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+
+    /* Poem Section */
+    .poem-section {
+      max-width: 900px;
+      width: 100%;
+      margin-bottom: 60px;
+    }
+
+    .poem-intro {
       text-align: center;
-      box-shadow: 0 18px 60px rgba(0,0,0,.15);
+      margin-bottom: 50px;
+      opacity: 0;
+      animation: fadeInUp 1s ease forwards;
+    }
+
+    .poem-intro h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 300;
+      letter-spacing: 0.05em;
+      margin-bottom: 15px;
+      background: linear-gradient(135deg, var(--accent-coral) 0%, var(--accent-lavender) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .poem-intro .subtitle {
+      font-size: clamp(1rem, 2.5vw, 1.4rem);
+      font-style: italic;
+      color: var(--text-medium);
+      opacity: 0.8;
+    }
+
+    .couplet {
+      background: var(--card-bg);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 40px;
+      margin-bottom: 30px;
+      opacity: 0;
+      transform: translateX(-100px) rotate(-5deg);
+      transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .couplet:nth-child(even) {
+      transform: translateX(100px) rotate(5deg);
+    }
+
+    .couplet::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255, 107, 122, 0.15) 0%, transparent 70%);
+      opacity: 0;
+      transition: opacity 0.6s ease;
+    }
+
+    .couplet::after {
+      content: '♥';
+      position: absolute;
+      font-size: 80px;
+      color: var(--accent-peach);
+      opacity: 0.08;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    .couplet:hover::before {
+      opacity: 1;
+    }
+
+    .couplet.visible {
+      opacity: 1;
+      transform: translateX(0) rotate(0deg);
+    }
+
+
+
+    .couplet-line {
+      font-family: 'Martel', serif;
+      font-size: clamp(1.3rem, 3vw, 2rem);
+      line-height: 1.8;
+      margin-bottom: 15px;
+      color: var(--text-dark);
+      text-align: center;
+      position: relative;
+      padding: 10px 0;
+    }
+
+    .couplet-line:last-child {
+      margin-bottom: 0;
+    }
+
+    .decorative-divider {
+      width: 60px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent-coral), transparent);
+      margin: 25px auto;
+      position: relative;
+    }
+
+    .decorative-divider::before,
+    .decorative-divider::after {
+      content: '✦';
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--accent-coral);
+      font-size: 12px;
+    }
+
+    .decorative-divider::before { left: -20px; }
+    .decorative-divider::after { right: -20px; }
+
+    /* Question Section */
+    .question-section {
+      max-width: 750px;
+      width: 100%;
+      text-align: center;
+      background: var(--card-bg);
+      backdrop-filter: blur(20px);
+      border: 2px solid var(--card-border);
+      border-radius: 30px;
+      padding: 50px 30px;
+      box-shadow: 
+        0 20px 60px rgba(255, 107, 122, 0.2),
+        0 0 100px rgba(255, 133, 161, 0.15);
+      opacity: 0;
+      transform: scale(0.9);
+      transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .question-section.visible {
+      opacity: 1;
+      transform: scale(1);
     }
 
     .art {
       width: min(260px, 80vw);
-      margin: 0 auto 10px;
+      margin: 0 auto 30px;
       display: block;
-      filter: drop-shadow(0 10px 14px rgba(0,0,0,.12));
+      filter: drop-shadow(0 15px 30px rgba(255, 107, 157, 0.3));
+      animation: float 3s ease-in-out infinite;
     }
 
-    h1 {
-      font-size: clamp(26px, 4vw, 44px);
-      margin: 12px 0 18px;
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-15px); }
+    }
+
+    .question-section h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 400;
+      margin-bottom: 35px;
+      background: linear-gradient(135deg, var(--accent-deep) 0%, var(--accent-lavender) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
     .button-zone {
@@ -74,57 +267,105 @@
       position: absolute;
       top: 50%;
       transform: translateY(-50%);
-      padding: 16px 24px;
-      font-size: 18px;
-      font-weight: 800;
-      border-radius: 999px;
+      padding: 18px 40px;
+      font-size: 1.2rem;
+      font-weight: 700;
+      font-family: 'Crimson Text', serif;
+      letter-spacing: 0.05em;
+      border-radius: 50px;
       border: none;
       cursor: pointer;
-      box-shadow: 0 10px 24px rgba(0,0,0,.14);
       user-select: none;
       -webkit-tap-highlight-color: transparent;
-      transition: transform .12s ease, background .12s ease;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 
+        0 10px 30px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
     }
 
     #yesBtn {
       left: 18%;
-      background: var(--yes);
+      background: linear-gradient(135deg, var(--accent-deep) 0%, var(--accent-rose) 100%);
       color: #fff;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     }
-    #yesBtn:hover { background: var(--yesHover); }
+
+    #yesBtn:hover {
+      box-shadow: 
+        0 15px 40px rgba(255, 107, 157, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      transform: translateY(-50%) translateY(-3px);
+    }
 
     #noBtn {
       left: 62%;
-      background: #e5e7eb;
-      color: #111827;
+      background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+      color: #e2e8f0;
     }
 
     .hint {
-      margin-top: 10px;
-      font-size: 13px;
-      opacity: .7;
+      margin-top: 25px;
+      font-size: 1rem;
+      font-style: italic;
+      color: var(--text-medium);
+      opacity: 0.7;
     }
 
     .result {
       display: none;
-      margin-top: 18px;
-      animation: pop .35s ease;
+      margin-top: 40px;
+      animation: celebrationPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
-    .result h2 {
-      font-size: clamp(30px, 4.5vw, 46px);
-      margin: 10px 0;
+    .result h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.5rem, 6vw, 4rem);
+      margin-bottom: 25px;
+      background: linear-gradient(135deg, var(--accent-coral) 0%, var(--accent-lavender) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
     .fireworks {
       width: min(380px, 90vw);
       margin: 0 auto;
       display: block;
+      border-radius: 15px;
+      box-shadow: 0 20px 60px rgba(255, 107, 122, 0.3);
     }
 
-    @keyframes pop {
-      from { transform: scale(.96); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
+    @keyframes celebrationPop {
+      0% { transform: scale(0.8); opacity: 0; }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .couplet {
+        padding: 30px 25px;
+      }
+
+      .question-section {
+        padding: 40px 25px;
+      }
+
+      button {
+        padding: 14px 30px;
+        font-size: 1rem;
+      }
     }
   </style>
 </head>
@@ -132,73 +373,142 @@
 <body>
   <canvas id="confettiCanvas"></canvas>
 
-  <main class="card">
-    <!-- ANIMAL WITH HEART -->
-    <svg class="art" viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <linearGradient id="fur" x1="0" x2="1">
-          <stop offset="0" stop-color="#f7c7a1"/>
-          <stop offset="1" stop-color="#f2a97b"/>
-        </linearGradient>
-        <linearGradient id="heart" x1="0" x2="1">
-          <stop offset="0" stop-color="#ff4d7d"/>
-          <stop offset="1" stop-color="#ff1f68"/>
-        </linearGradient>
-      </defs>
+  <div class="container">
+    <!-- Poem Section -->
+    <section class="poem-section">
+      <div class="poem-intro">
+        <h1>hello bhavana!!!</h1>
+      </div>
 
-      <path d="M250 50 C250 33 270 25 282 38
-               C294 25 314 33 314 50
-               C314 78 282 92 282 106
-               C282 92 250 78 250 50Z"
-            fill="url(#heart)"/>
+      <div class="couplet" data-delay="200">
+        <div class="couplet-line">तुझ्या स्पर्शाविना हे प्राण उरणे शक्य नाही</div>
+        <div class="decorative-divider"></div>
+        <div class="couplet-line">तुझ्या वाचून आता प्रेम करणे शक्य नाही</div>
+      </div>
 
-      <path d="M90 120 C90 70 140 40 190 60
-               C240 40 290 70 290 120
-               C290 180 240 210 190 210
-               C140 210 90 180 90 120Z"
-            fill="url(#fur)"/>
+      <div class="couplet" data-delay="400">
+        <div class="couplet-line">तुझ्या केसांतूनी वारा बिथरतो जीव भुलतो</div>
+        <div class="decorative-divider"></div>
+        <div class="couplet-line">आता बेधुंद वाऱ्याचे हे फिरणे शक्य नाही</div>
+      </div>
 
-      <path d="M110 92 L95 55 L140 78 Z" fill="#f2a97b"/>
-      <path d="M270 92 L285 55 L240 78 Z" fill="#f2a97b"/>
-
-      <circle cx="160" cy="130" r="8"/>
-      <circle cx="220" cy="130" r="8"/>
-
-      <path d="M190 144 C186 144 182 148 182 152
-               C182 160 190 164 190 170
-               C190 164 198 160 198 152
-               C198 148 194 144 190 144Z"
-            fill="#ff7aa2"/>
-    </svg>
-
-    <h1>bhavana will you be my valentine? 🫠</h1>
-
-    <section class="button-zone" id="zone">
-      <button id="yesBtn">Yes</button>
-      <button id="noBtn">No</button>
+      <div class="couplet" data-delay="600">
+        <div class="couplet-line">तुझ्या ओठांतूनी जे जीवनाचे सार कळले</div>
+        <div class="decorative-divider"></div>
+        <div class="couplet-line">मला दुसरे पुन्हा काहीच कळणे शक्य नाही</div>
+      </div>
     </section>
 
-    <!-- HINT -->
-    <div class="hint" id="hint">“No” seems a bit shy 😈</div>
+    <!-- Question Section -->
+    <section class="question-section">
+      <svg class="art" viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="fur" x1="0" x2="1" y1="0" y2="1">
+            <stop offset="0" stop-color="#ffb8d1"/>
+            <stop offset="1" stop-color="#ff8fb5"/>
+          </linearGradient>
+          <linearGradient id="heart" x1="0" x2="1" y1="0" y2="1">
+            <stop offset="0" stop-color="#ff4d7d"/>
+            <stop offset="1" stop-color="#ff1f68"/>
+          </linearGradient>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+            <feMerge>
+              <feMergeNode in="coloredBlur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+        </defs>
 
-    <section class="result" id="result">
-      <h2>YAY! 🎉</h2>
-      <img
-        class="fireworks"
-        src="https://media.giphy.com/media/26ufdipQqU2lhNA4g/giphy.gif"
-        alt="Fireworks"
-      />
+        <path d="M250 50 C250 33 270 25 282 38
+                 C294 25 314 33 314 50
+                 C314 78 282 92 282 106
+                 C282 92 250 78 250 50Z"
+              fill="url(#heart)" filter="url(#glow)">
+          <animate attributeName="opacity" values="0.8;1;0.8" dur="2s" repeatCount="indefinite"/>
+        </path>
+
+        <path d="M90 120 C90 70 140 40 190 60
+                 C240 40 290 70 290 120
+                 C290 180 240 210 190 210
+                 C140 210 90 180 90 120Z"
+              fill="url(#fur)"/>
+
+        <path d="M110 92 L95 55 L140 78 Z" fill="#ff8fb5"/>
+        <path d="M270 92 L285 55 L240 78 Z" fill="#ff8fb5"/>
+
+        <circle cx="160" cy="130" r="8" fill="#1a0a1e"/>
+        <circle cx="220" cy="130" r="8" fill="#1a0a1e"/>
+
+        <path d="M190 144 C186 144 182 148 182 152
+                 C182 160 190 164 190 170
+                 C190 164 198 160 198 152
+                 C198 148 194 144 190 144Z"
+              fill="#ff4d7d"/>
+      </svg>
+
+      <h2 style="font-size: clamp(1.5rem, 4vw, 2.5rem);">bhavana, will you be my valentine? 💕</h2>
+
+      <div class="button-zone" id="zone">
+        <button id="yesBtn">Yes! ✨</button>
+        <button id="noBtn">No</button>
+      </div>
+
+      <div class="hint" id="hint">The "No" button seems a bit shy 😈</div>
+
+      <section class="result" id="result">
+        <h3>YAY! 🎉💖</h3>
+        <img
+          class="fireworks"
+          src="https://media.giphy.com/media/26ufdipQqU2lhNA4g/giphy.gif"
+          alt="Fireworks celebration"
+        />
+      </section>
     </section>
-  </main>
+  </div>
 
   <script>
-    const zone = document.getElementById("zone");
-    const yesBtn = document.getElementById("yesBtn");
-    const noBtn = document.getElementById("noBtn");
-    const result = document.getElementById("result");
-    const hint = document.getElementById("hint");
+    // Intersection Observer for scroll-triggered animations
+    const observerOptions = {
+      threshold: 0.2,
+      rootMargin: '0px 0px -100px 0px'
+    };
 
-    /* ---------- CONFETTI ---------- */
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const delay = entry.target.dataset.delay || 0;
+          setTimeout(() => {
+            entry.target.classList.add('visible');
+          }, delay);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, observerOptions);
+
+    // Observe all couplets
+    document.querySelectorAll('.couplet').forEach(couplet => {
+      observer.observe(couplet);
+    });
+
+    // Show question section after last couplet
+    const lastCouplet = document.querySelector('.couplet:last-of-type');
+    const questionSection = document.querySelector('.question-section');
+    
+    const questionObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          setTimeout(() => {
+            questionSection.classList.add('visible');
+          }, 800);
+          questionObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.5 });
+
+    questionObserver.observe(lastCouplet);
+
+    // Confetti setup
     const confettiCanvas = document.getElementById("confettiCanvas");
 
     function resizeConfettiCanvas() {
@@ -219,38 +529,46 @@
     });
 
     function fullScreenConfetti() {
-      const end = Date.now() + 1600;
+      const colors = ['#ff6b7a', '#ff85a1', '#ffb3ba', '#e4b1f0', '#ffd6e3'];
+      const end = Date.now() + 3000;
 
       (function frame() {
         confettiInstance({
-          particleCount: 12,
-          spread: 90,
-          startVelocity: 45,
-          ticks: 180,
-          origin: { x: Math.random(), y: Math.random() * 0.3 }
+          particleCount: 15,
+          spread: 100,
+          startVelocity: 50,
+          ticks: 200,
+          colors: colors,
+          origin: { x: Math.random(), y: Math.random() * 0.4 }
         });
         if (Date.now() < end) requestAnimationFrame(frame);
       })();
 
       setTimeout(() => {
         confettiInstance({
-          particleCount: 300,
-          spread: 140,
-          startVelocity: 60,
-          ticks: 220,
-          origin: { x: 0.5, y: 0.55 }
+          particleCount: 400,
+          spread: 160,
+          startVelocity: 70,
+          ticks: 250,
+          colors: colors,
+          origin: { x: 0.5, y: 0.5 }
         });
-      }, 300);
+      }, 500);
     }
 
-    /* ---------- YES BUTTON GROWS ---------- */
+    // Button interactions
+    const zone = document.getElementById("zone");
+    const yesBtn = document.getElementById("yesBtn");
+    const noBtn = document.getElementById("noBtn");
+    const result = document.getElementById("result");
+    const hint = document.getElementById("hint");
+
     let yesScale = 1;
     function growYes() {
       yesScale = Math.min(2.2, yesScale + 0.1);
       yesBtn.style.transform = `translateY(-50%) scale(${yesScale})`;
     }
 
-    /* ---------- NO BUTTON RUNS AWAY ---------- */
     function clamp(n, min, max) {
       return Math.max(min, Math.min(max, n));
     }
@@ -289,11 +607,16 @@
 
     noBtn.addEventListener("click", e => e.preventDefault());
 
-    /* ---------- YES CLICK ---------- */
     yesBtn.addEventListener("click", () => {
       zone.style.display = "none";
-      hint.style.display = "none";     // HIDE THE HINT
+      hint.style.display = "none";
       result.style.display = "block";
+      
+      // Scroll to result smoothly
+      setTimeout(() => {
+        result.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+      
       resizeConfettiCanvas();
       fullScreenConfetti();
     });
